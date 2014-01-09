@@ -13,6 +13,7 @@ class Drive(common.ComponentBase):
         self.robot_drive = config.robot_drive
         self.drive_joy = config.drive_joy
         self.hs_button = config.hs_button
+        self.sqrd_button = config.sqrd_button
 
     def op_init(self):
         self.robot_drive.StopMotor()
@@ -23,4 +24,7 @@ class Drive(common.ComponentBase):
         if self.hs_button.get():
             speed /= 2
             rot /= 2
-        self.robot_drive.ArcadeDrive(speed, rot)
+        squared_inputs = False
+        if sqrd_button.get():
+            squared_inputs = True
+        self.robot_drive.ArcadeDrive(speed, rot, squared_inputs)

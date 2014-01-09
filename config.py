@@ -18,11 +18,11 @@ componets = []
 class DriveConfig(object):
     robot_drive = wpilib.RobotDrive(leftMotor, rightMotor)
 
-    drive_joy = leftJoy
+    drive_joy = rightJoy
 
     # Buttons
-    align_button = Button(rightJoy, 3)
-    hs_button = Button(leftJoy, 1)
+    hs_button = Button(rightJoy, 1)
+    sqrd_button = Button(rightJoy, 4)
 
 class ShooterConfig(object):
 	shooter_joy = leftJoy
