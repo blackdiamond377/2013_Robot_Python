@@ -31,3 +31,43 @@ class ButtonControlledMotor(common.ComponentBase):
         else:
             self.motor.Set(0)
 
+
+class CounterPIDSource(object):
+    
+    def __init__(self, counter, buffer):
+        self.counter = counter
+        self.speeds = buffer
+
+    def get_buffered_rpm(self):
+        return self.PID_get()
+
+    def get_rps(self):
+        return 1/self.counter.GetPeriod()
+
+    def PID_get(self):
+        self.speeds.add(self.get_rpm())
+        return self.speeds.get_average()
+
+    def get_rpm():
+        return self.get_rps()*60
+
+
+
+class RingBuffer(object):
+
+    def __init__(self, length):
+        self.length = length
+        buffer = []
+        self.idx = 0
+
+    def add(newVal):
+        self.buffer[idx] = newVal
+        self.idx++
+        if self.idx > self.length:
+            self.idx = 0
+
+    def get_average(self):
+        total = 0
+        for i in range(self.length):
+            total += self.buffer[i]
+        return total / self.length
