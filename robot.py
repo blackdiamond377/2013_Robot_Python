@@ -14,7 +14,7 @@ class MyRobot(wpilib.SimpleRobot):
         self.components = config.componets
 
     def RobotInit(self):
-
+        config.compressor.Start()
         for component in self.components:
             component.robot_init()
 

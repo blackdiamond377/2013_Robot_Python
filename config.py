@@ -11,6 +11,7 @@ rightJoy = wpilib.Joystick(2)
 leftMotor = wpilib.Jaguar(1)
 rightMotor = wpilib.Jaguar(2)
 
+compressor = wpilib.Compressor(14,8)
 
 componets = []
 
