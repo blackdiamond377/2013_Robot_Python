@@ -29,6 +29,7 @@ class ShooterConfig(object):
 	presets = [Button(leftJoy, x+5) for x in range(6)]
 	ss_up_button = Button(leftJoy, 3)
 	ss_down_button = Button(leftJoy, 4)
+	lift_button = Button(leftJoy, 2)
 
 	shooter_motor = wpilib.Jaguar(3)
 	lift = wpilib.Talon(4)
@@ -51,6 +52,10 @@ class ShooterConfig(object):
 
 	TOWER_COUNT = -460
 	TOWER_SPEED = .365
+
+	extend = wpilib.DoubleSolenoid.Value.kReverse
+	retract = wpilib.DoubleSolenoid.Value.kForward
+	shooter_piston = wpilib.DoubleSolenoid(5, 6)
 
 
 componets.append(drive.Drive(DriveConfig))

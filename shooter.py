@@ -28,6 +28,7 @@ class Shooter(common.ComponentBase):
 
 		self.lift_halls = config.lift_halls
 		self.lift = config.lift
+		self.lift_button = config.lift_button
 
 		LOADER_COUNT = config.LOADER_COUNT
 		BACK_COUNT = config.BACK_COUNT
@@ -39,10 +40,20 @@ class Shooter(common.ComponentBase):
 		FRONT_SPEED = config.FRONT_SPEED
 		TOWER_SPEED = config.TOWER_SPEED
 
+		p_manual_shooter_speed = None
+		pot_val = None
+
 		self.ss_up_button = config.ss_up_button
 		self.ss_down_button = config.ss_down_button
 		self.ss_up_pressed = False
 		self.ss_down_pressed = False
+
+		self.shooting = False
+		self.trigger_time = -1
+
+		self.shooter_piston = config.shooter_piston
+		self.extend = config.extend
+		self.retract = config.retract
 
 	def op_init(self):
 		self.shooter_hall.SetMaxPeriod(1)
@@ -52,24 +63,22 @@ class Shooter(common.ComponentBase):
 		self.lift_halls.Start()
 
 	def op_tick(self, time):
-		shooterRPM = self.hall_source.get_buffered_rpm()
-
-
+		lift_speed = self.joy.GetY()
 	   # Manual shooter speed adjustments
-	    if shooterPotVal != ((joy1.getX() * -1) + 1) / 2:
-            manualShooterSpeed = ((joy1.getX() * -1) + 1) / 2    
+	    if self.pot_val != ((self.joy.getX() * -1) + 1) / 2:
+            manual_shooter_speed = ((self.joy.getX() * -1) + 1) / 2    
         else:
            # if shooter potentiometer hasnt changed then keep the old value including button adjustments
-            manualShooterSpeed = previousManualShooterSpeed;
+            manual_shooter_speed = self.p_manual_shooter_speed;
 
         if self.ss_up_button.get() and not ss_up_pressed:
-            manualShooterSpeed += .05;
+            manual_shooter_speed += .05;
             self.ss_up_pressed = True;
         else:
         	self.ss_up_pressed = False
         
 		if self.ss_down_button.get() and not ss_down_pressed:
-            manualShooterSpeed -= .05;
+            manual_shooter_speed -= .05;
             self.ss_down_pressed = True;
         else:
         	self.ss_down_pressed = False
@@ -85,15 +94,15 @@ class Shooter(common.ComponentBase):
 			self.shooter_motor.Set(LOADER_SPEED)
 	    # Manual
 		elif self.presets[2].get():
-            if not bottomLimit.Get() and liftSpeed < 0):
-                lift.Set(0)
-            elif not topLimit.Get() and liftSpeed > 0:
-                lift.Set(0)
-            elif joy1.getRawButton(2):
-                lift.Set(liftSpeed)
-            elif not joy1.getRawButton(2)):
-                lift.Set(0)
-            shooter.set(manualShooterSpeed)
+            if not self.bottomLimit.Get() and lift_speed < 0):
+                self.lift.Set(0)
+            elif not self.topLimit.Get() and lift_speed > 0:
+                self.lift.Set(0)
+            elif self.lift_button.get():
+                self.lift.Set(lift_speed)
+            elif not self.lift_button.get():
+                self.lift.Set(0)
+            self.shooter.Set(manual_shooter_speed)
 
 	    # Back
 		elif self.presets[3].get():
@@ -107,6 +116,10 @@ class Shooter(common.ComponentBase):
 	    elif self.presets[5].get():
 	    	lift_to_count(TOWER_COUNT)
 			self.shooter_motor.Set(TOWER_SPEED)
+
+		shoot(time)
+		self.pot_val = ((self.joy.GetX() * -1) + 1) / 2
+		self.p_manual_shooter_speed = manual_shooter_speed
 
 
 	def lift_to_count(self, destination):
@@ -131,4 +144,19 @@ class Shooter(common.ComponentBase):
 
         else:
             self.lift.Set(0)
-    
+
+    def shoot(self, timestamp):
+       # If the button is pressed and you aren't yet shooting
+        if shoot_button.get() and not self.shooting:
+            self.shooting = true
+            triggerTime = timestamp
+            self.shooter_piston.Set(self.extend)
+       # Else, reset and say you aren't shooting anymore
+        else:
+            currentTime = timestamp
+            timeSinceTrigger = currentTime - self.triggerTime
+            
+            if timeSinceTrigger > 0.6:
+                self.shooting = false
+            elif timeSinceTrigger > 0.5:
+                self.shooter_piston.Set(self.retract)
